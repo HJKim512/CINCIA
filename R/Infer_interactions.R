@@ -221,8 +221,7 @@ FindInteraction <- function( DeconvObj, refObj, col.label, lower.frac=0.1, OutPa
   signif <- lapply(result,
                    FUN=function(x){ x$combination.final[ (x$combination.final$BonF<0.05 &
                                                           x$combination.final$ratio>1.0 ), ] })
-  cat(signif)
-  cat('\n\n')
+
   saveRDS(signif, paste0(OutPath, "2.Doublet/3.Inference.sig.Rds"))
 
   return(result)
