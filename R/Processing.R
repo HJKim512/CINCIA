@@ -26,12 +26,16 @@ Lower_plot_Preprocess <- function( rawObj, expMtx, OutPath, project.id='Project'
     cat(paste0(" Saving Expression matrix to the path : ", OutPath, '1.Processing/raw\n'))
     expMtx <- as.matrix(rawObj@assays$RNA@counts)
     expMtx.nonz <- expMtx[ rowSums(expMtx)!=0, ]
-    write.table(expMtx.nonz, paste0(OutPath, "1.Processing/raw/rawData.ExpMtx.nonZero.txt"),  sep='\t', quote=FALSE)
+    # 2022.08.26 added - using fwrite
+    fwrite(expMtx.nonz, paste0(OutPath, "1.Processing/raw/rawData.ExpMtx.nonZero.txt"), sep='\t', quote = FALSE, row.names = T)
+    #write.table(expMtx.nonz, paste0(OutPath, "1.Processing/raw/rawData.ExpMtx.nonZero.txt"),  sep='\t', quote=FALSE)
 
     cat(" Saving label table to the path : ", OutPath, '\n\n')
     label <- data.frame(Cell_barcode = colnames(expMtx.nonz), library = rep(project.id, ncol(expMtx.nonz)), stringsAsFactors = FALSE)
     rownames(label) <- label$Cell_barcode
-    write.table(label, paste0( OutPath, "1.Processing/raw/rawData.LabelTable.txt" ),  sep='\t', quote=FALSE, row.names = FALSE)
+    # 22.08.26 added - fwrite
+    fwrite(label, paste0( OutPath, "1.Processing/raw/rawData.LabelTable.txt" ), sep='\t', quote = FALSE, row.names=T)
+    #write.table(label, paste0( OutPath, "1.Processing/raw/rawData.LabelTable.txt" ),  sep='\t', quote=FALSE, row.names = FALSE)
 
     cat(" Saving Seurat object to the path : ", OutPath, '\n\n')
     saveRDS(rawObj, paste0(OutPath, "1.Processing/tmp/rawObj.Rds"))
@@ -52,7 +56,9 @@ Lower_plot_Preprocess <- function( rawObj, expMtx, OutPath, project.id='Project'
     label <- data.frame(Cell_barcode = colnames(expMtx.nonz),
                         library = rep(project.id, ncol(expMtx.nonz)), stringsAsFactors = FALSE)
     rownames(label) <- label$Cell_barcode
-    write.table(label, paste0( OutPath, "1.Processing/raw/rawData.LabelTable.txt" ),  sep='\t', quote=FALSE, row.names = FALSE)
+    # 22.08.26 added - fwrite
+    fwrite(label, paste0( OutPath, "1.Processing/raw/rawData.LabelTable.txt" ), sep='\t', quote=FALSE, row.names=T)
+    #write.table(label, paste0( OutPath, "1.Processing/raw/rawData.LabelTable.txt" ),  sep='\t', quote=FALSE, row.names = FALSE)
 
     cat(" Creating and saving Seurat object to the path : ", OutPath, '\n\n')
     rawObj <- CreateSeuratObject(counts= expMtx.nonz, project=project.id)
@@ -337,7 +343,9 @@ UMAPtoDEG_Process <- function( Obj.norm, nPC=20, genes, seed=777778, res=0.8, Ou
   top10 <- Obj.norm.markers %>% group_by(cluster) %>% top_n(10, avg_log2FC); top10
   dehm <- DoHeatmap(object = Obj.norm, features = top10$gene, angle = 90, size = 1, raster = T, draw.lines = T, label=T)
   ggsave(paste0(OutPath, "1.Processing/deg/1.Heatmap.markers.res.", res,".pdf"), units = 'cm', width = 50, height = 40)
-  write.table(Obj.norm.markers, paste0(OutPath, "1.Processing/deg/2.Table.markers.res", res,".txt"), sep = '\t', quote = F, col.names = T, row.names = F)
+  # 22.08.26 added - fwrite
+  fwrite(Obj.norm.markers, paste0(OutPath, "1.Processing/deg/2.Table.markers.res", res,".txt"), sep='\t', quote = FALSE, row.names = T)
+  #write.table(Obj.norm.markers, paste0(OutPath, "1.Processing/deg/2.Table.markers.res", res,".txt"), sep = '\t', quote = F, col.names = T, row.names = F)
 
   return(Obj.norm)
 }

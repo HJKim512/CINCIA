@@ -16,6 +16,8 @@
 #'
 Simulate_Hetero_Doublets <- function( refObj, nSimul=100, nDbl, col.ref, OutPath ){
   all.result <- list()
+  require(data.table)
+  require(dplyr)
 
   if (missing(refObj))
       stop('\'refObj\' was not supplied : A fully-processed Seurat object containing singlets is required.')
@@ -84,15 +86,17 @@ Simulate_Hetero_Doublets <- function( refObj, nSimul=100, nDbl, col.ref, OutPath
     dir.create(path)
 
     cat('   - Saving expression matrix . . .', '\n')
-    write.table(simulMtx.nonZ, paste( path, "/simulDbls.ExpMtx.txt", sep=''),  sep='\t', quote=FALSE)
+    # 22.08.26 modified - fwrite
+    fwrite(simulMtx.nonZ, paste( path, "/simulDbls.ExpMtx.txt", sep=''), sep='\t', quote = FALSE, row.names = T)
+    #write.table(simulMtx.nonZ, paste( path, "/simulDbls.ExpMtx.txt", sep=''),  sep='\t', quote=FALSE)
+
     cat('   - Saving Label table . . .', '\n')
-    write.table(label, paste( path, "/simulDbls.LabelTable.txt", sep=''),  sep='\t', quote=FALSE, row.names = FALSE)
+    # 22.08.26 modified - fst package
+    fwrite(label, paste(path, "/simulDbls.LabelTable.txt", sep=''), sep='\t', quote = FALSE, row.names=T)
+    #write.table(label, paste( path, "/simulDbls.LabelTable.txt", sep=''),  sep='\t', quote=FALSE, row.names = FALSE)
   }
   saveRDS(all.result, paste0(OutPath, '2.Simul/0.SimulDoubletInfo.Rds'))
 }
-
-
-
 
 
 #' Doublet scoring through Scrublet, a python-based algorithm (Wolock, et al. 2019)
@@ -121,8 +125,11 @@ DoubletScoring_Scrublet <- function( PyPath, InPath, OutPath, type, nSet, nRun=1
   if (missing(nRun)) stop("\'nRun\' was not supplied")
 
   require(reticulate)
-  reticulate::use_python(PyPath)
+  require(data.table)
+  require(dplyr)
 
+  reticulate::use_python(PyPath)
+  # 22.08.26 added - "inst/"
   script <- paste(system.file(package="CINCIA"), "Detecting_Scr.py", sep = "/")
   source_python(script)
 
@@ -156,8 +163,10 @@ DoubletScoring_Hybrid <- function( InPath, OutPath, type, nSet, nRun=10){
   require(Seurat)
   require(scds)
   require(SingleCellExperiment)
+  require(data.table)
+  require(dplyr)
 
-  outScores.All <- c()
+  #outScores.All <- c()
   start_time <- Sys.time()
 
   for (i in 1:nSet) {
@@ -180,8 +189,12 @@ DoubletScoring_Hybrid <- function( InPath, OutPath, type, nSet, nRun=10){
           cat('   - Output directory : ', outdir, "\n")
           cat("===========================================================================================\n")
 
-          Mtx <- read.delim(paste0(InPath, mtxFile), header = T, sep='\t',  check.names = FALSE, row.names = 1)
+          # 22.08.26 modified - fread
+          Mtx <- fread(paste0(InPath, mtxFile), check.names = FALSE) %>% as.data.frame()
+          rownames(Mtx) <- Mtx$V1
+          Mtx <- Mtx %>% select(!V1)
           Mtx <- as.matrix(Mtx)
+
     } else {
           cat("   Data type : Simulated count matrix\n")
           setname <- paste0('simul_', i)
@@ -195,8 +208,14 @@ DoubletScoring_Hybrid <- function( InPath, OutPath, type, nSet, nRun=10){
           cat('   - Output directory : ', outdir, "\n")
           cat("===========================================================================================\n")
 
-          Mtx <- read.delim(paste0(indir, mtxFile), header = T, sep='\t',  check.names = FALSE, row.names = 1)
+          # 22.08.26 modified - fread
+          Mtx <- fread(paste0(indir, mtxFile), check.names = FALSE) %>% as.data.frame()
+          rownames(Mtx) <- Mtx$V1
+          Mtx <- Mtx %>% select(!V1)
           Mtx <- as.matrix(Mtx)
+
+          #Mtx <- read.delim(paste0(indir, mtxFile), header = T, sep='\t',  check.names = FALSE, row.names = 1)
+          #Mtx <- as.matrix(Mtx)
     }
 
     sceobj <- SingleCellExperiment(list(counts=Mtx))
@@ -211,7 +230,7 @@ DoubletScoring_Hybrid <- function( InPath, OutPath, type, nSet, nRun=10){
         outScores[[iter]] <- colData(res)
     }
     end_time <- Sys.time()
-    outScores.All[[setname]] <- outScores
+    #outScores.All[[setname]] <- outScores
 
     if (type=='raw') cat("\n--------------------> Finished <--------------------\n")
     else cat("\n--------------------> Dataset ", i, " Finished ! <--------------------\n\n")
@@ -247,8 +266,10 @@ DoubletScoring_scDblFinder <- function( InPath, OutPath, type, nSet, nRun=10, es
 
   require(scDblFinder)
   require(SingleCellExperiment)
+  require(dplyr)
+  require(data.table)
 
-  outScores.All <- c()
+  #outScores.All <- c()
   start_time <- Sys.time()
 
   for (i in 1:nSet) {
@@ -270,8 +291,14 @@ DoubletScoring_scDblFinder <- function( InPath, OutPath, type, nSet, nRun=10, es
         cat('   - Output directory : ', outdir, "\n")
         cat("===========================================================================================\n")
 
-        Mtx <- read.delim(paste0(InPath, mtxFile), header = T, sep='\t',  check.names = FALSE, row.names = 1)
+        # 22.08.26 modified - fread
+        Mtx <- fread(paste0(InPath, mtxFile), check.names = FALSE) %>% as.data.frame()
+        rownames(Mtx) <- Mtx$V1
+        Mtx <- Mtx %>% select(!V1)
         Mtx <- as.matrix(Mtx)
+
+        #Mtx <- read.delim(paste0(InPath, mtxFile), header = T, sep='\t',  check.names = FALSE, row.names = 1)
+        #Mtx <- as.matrix(Mtx)
     } else {
         cat("   Data type : Simulated count matrix\n")
         setname <- paste0('simul_', i)
@@ -285,8 +312,14 @@ DoubletScoring_scDblFinder <- function( InPath, OutPath, type, nSet, nRun=10, es
         cat('   - Output directory : ', outdir, "\n")
         cat("===========================================================================================\n")
 
-        Mtx <- read.delim(paste0(indir, mtxFile), header = T, sep='\t',  check.names = FALSE, row.names = 1)
+        # 22.08.26 modified - fread
+        Mtx <- fread(paste0(indir, mtxFile), check.names = FALSE) %>% as.data.frame()
+        rownames(Mtx) <- Mtx$V1
+        Mtx <- Mtx %>% select(!V1)
         Mtx <- as.matrix(Mtx)
+
+        #Mtx <- read.delim(paste0(indir, mtxFile), header = T, sep='\t',  check.names = FALSE, row.names = 1)
+        #Mtx <- as.matrix(Mtx)
     }
 
     sceobj <- SingleCellExperiment(list(counts=Mtx))
@@ -304,7 +337,7 @@ DoubletScoring_scDblFinder <- function( InPath, OutPath, type, nSet, nRun=10, es
       outScores[[iter]] <- colData(res)
     }
     end_time <- Sys.time()
-    outScores.All[[setname]] <- outScores
+    #outScores.All[[setname]] <- outScores
 
     if (type=='raw') cat("\n--------------------> Finished <--------------------\n")
     else cat("\n--------------------> Dataset ", i, " Finished ! <--------------------\n\n")

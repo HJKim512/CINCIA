@@ -32,6 +32,9 @@ Bind_Doublet_Scores <- function( type, nRun=10, nSet, InPath ) {
 
   if (grepl("/$", InPath) == FALSE) { InPath <- paste0(InPath, '/') }
 
+  require(dplyr)
+  require(data.table)
+
   DblScores.All <- list()
   Hybrid.scores <- list()
   Scrublet.scores <- list()
@@ -121,7 +124,12 @@ Bind_Doublet_Scores <- function( type, nRun=10, nSet, InPath ) {
       } else {
           file <- paste(  "2.Simul/Output/", set_name, "/scr_", j,".scrublet_result.txt", sep='')
       }
-      result <- read.delim(paste0(InPath, file), header=T, sep='\t')
+
+
+      # 22.08.26 modified - fread
+
+      result <- fread(paste0(InPath, file), check.names = FALSE) %>% as.data.frame()
+      #result <- read.delim(paste0(InPath, file), header=T, sep='\t')
 
       if (j==1) {
           res <- data.frame( row.names = result$Cell_barcode, result$Scrublet_score)
