@@ -1,9 +1,8 @@
 # CINCIA
 
+CINCIA, which represents 'Computational Inference of Cell-Cell Interactions from scRNA-seq Data', is an R package for inferring putative heterotypic cell-cell interactions using scRNA-seq data in the form of gene expression matrix. In this package, putative doublets are predicted first by the doublet meta-caller, which utilizes three different existing doublet callers, after conventional scRNA-seq data processing. Subsequently, two cell-types that are most likely to constitute each doublet are inferred, and then putative cell-cell interactions are inferred through statistical comparison between expected number and observed number of them.  
+
 ![README_workflow](https://user-images.githubusercontent.com/61574172/199141150-ffe983c3-62ab-4bb2-aaa4-afc0e7b61852.png)
-
-CINCIA, which represents 'Computational Inference of Cell-Cell Interactions from scRNA-seq Data', is an R package for inferring potential hetero-typic cell-cell interactions using scRNA-seq data. In this package, putative doublets are predicted by three different doublet callers, subjected to a meta-caller inferring a posterior probability of cell-cell interaction.  
-
 
 ### Contents
 
