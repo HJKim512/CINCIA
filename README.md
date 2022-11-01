@@ -22,7 +22,6 @@ CINCIA, which represents 'Computational Inference of Cell-Cell Interactions from
 
 * **Infer_interactions.R**  
   Finally, doublets are assigned the two most likely cell types, and putative heterotypic cell-cell interactions are inferred from the deconvoluted putative doublets.  
-  
 <br>
 
 ### Installation
@@ -32,7 +31,6 @@ Install from github
 devtools::install_github("HJKim512/CINCIA")
 library(CINCIA)
 ```
-
 <br>
 
 ### Analysis Example  
