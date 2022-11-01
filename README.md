@@ -1,7 +1,8 @@
 # CINCIA
 
-CINCIA, which represents 'Computational Inference of Cell-Cell Interactions from scRNA-seq Data', is an R package for inferring potential hetero-typic cell-cell interactions using scRNA-seq data. In this package, putative doublets are predicted by three different doublet callers, subjected to a meta-caller inferring a posterior probability of cell-cell interaction.  
+![README_workflow](https://user-images.githubusercontent.com/61574172/199141150-ffe983c3-62ab-4bb2-aaa4-afc0e7b61852.png)
 
+CINCIA, which represents 'Computational Inference of Cell-Cell Interactions from scRNA-seq Data', is an R package for inferring potential hetero-typic cell-cell interactions using scRNA-seq data. In this package, putative doublets are predicted by three different doublet callers, subjected to a meta-caller inferring a posterior probability of cell-cell interaction.  
 
 
 ### Contents
@@ -13,7 +14,7 @@ CINCIA, which represents 'Computational Inference of Cell-Cell Interactions from
   
   
 * **Detect_Doublets.R**
-  Those functions detect putative doublets through three widely-used doublet detection tools including Hybrid (Bais and Kostka, 2019), scDblFinder (Germain, et al., 2021) and Scrublet (Wolock, et al., 2019).  
+  Those functions detect putative doublets through three widely-used doublet detection tools including Hybrid (Bais and Kostka, 2019), scDblFinder (Germain, et al., 2021) and Scrublet (Wolock, et al., 2019). For implementing Scrublet, an appropriate path to the python you want to use should be known, and Scrublet should be imported. 
 
 
 * **Define_Doublets.R**  
@@ -32,7 +33,6 @@ Install from github
 devtools::install_github("HJKim512/CINCIA")
 library(CINCIA)
 ```
-
 
 <br>
 
